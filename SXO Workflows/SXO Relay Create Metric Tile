@@ -1,0 +1,167 @@
+{
+  "workflow": {
+    "unique_name": "definition_workflow_01UELI0JEFI1O1VAmziT2c0wKo7TGRxeV1b",
+    "name": "SXO Relay Create Metric Tile",
+    "title": "SXO Relay Create Metric Tile",
+    "type": "generic.workflow",
+    "base_type": "workflow",
+    "variables": [
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "input",
+          "name": "Tile Title",
+          "type": "datatype.string",
+          "is_required": true,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01UELJBPK9QSM2BUYfbwQUZ8LdD3aMPbSLJ",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "tabletype_01UELHRQLYPHG4D61vZ7CqdQIi6yTHYnZaj",
+        "properties": {
+          "scope": "output",
+          "name": "Tile Data",
+          "type": "datatype.table",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01UELIVVNGCW61fv7faL9e5ci1EkqOr0lJF",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "object",
+          "scope": "input",
+          "name": "Tile Icon",
+          "type": "datatype.string",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01UELJNK8HKO55hzL2DdVyBhTKPrlHEKBlW",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "https://security.cisco.com",
+          "scope": "input",
+          "name": "Tile Link",
+          "type": "datatype.string",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01UELK2O2QNGQ0od5mobjEI49FjcDGIazjN",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.integer",
+        "properties": {
+          "value": 0,
+          "scope": "input",
+          "name": "Tile Metric",
+          "type": "datatype.integer",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01UELKH4N5GVB1B9xHJf0la6P7LHfpT6G66",
+        "object_type": "variable_workflow"
+      }
+    ],
+    "properties": {
+      "atomic": {
+        "atomic_group": "SXO Relay Module",
+        "is_atomic": true
+      },
+      "delete_workflow_instance": false,
+      "display_name": "SXO Relay Create Metric Tile",
+      "runtime_user": {
+        "target_default": true
+      },
+      "target": {
+        "no_target": true
+      }
+    },
+    "object_type": "definition_workflow",
+    "actions": [
+      {
+        "unique_name": "definition_activity_01UELKV5X2CLR4N7J7R4xek1o1DdeXlIxEG",
+        "name": "Add Row to Table",
+        "title": "Add Row to Table",
+        "type": "core.addrowtotable",
+        "base_type": "activity",
+        "properties": {
+          "action_timeout": 180,
+          "continue_on_failure": false,
+          "display_name": "Add Row to Table",
+          "input_table": "$workflow.definition_workflow_01UELI0JEFI1O1VAmziT2c0wKo7TGRxeV1b.output.variable_workflow_01UELIVVNGCW61fv7faL9e5ci1EkqOr0lJF$",
+          "row": [
+            {
+              "key": "title",
+              "type": "string",
+              "value": "$workflow.definition_workflow_01UELI0JEFI1O1VAmziT2c0wKo7TGRxeV1b.input.variable_workflow_01UELJBPK9QSM2BUYfbwQUZ8LdD3aMPbSLJ$"
+            },
+            {
+              "key": "icon",
+              "type": "string",
+              "value": "$workflow.definition_workflow_01UELI0JEFI1O1VAmziT2c0wKo7TGRxeV1b.input.variable_workflow_01UELJNK8HKO55hzL2DdVyBhTKPrlHEKBlW$"
+            },
+            {
+              "key": "link",
+              "type": "string",
+              "value": "$workflow.definition_workflow_01UELI0JEFI1O1VAmziT2c0wKo7TGRxeV1b.input.variable_workflow_01UELK2O2QNGQ0od5mobjEI49FjcDGIazjN$"
+            },
+            {
+              "key": "metric_value",
+              "type": "integer",
+              "value": "$workflow.definition_workflow_01UELI0JEFI1O1VAmziT2c0wKo7TGRxeV1b.input.variable_workflow_01UELKH4N5GVB1B9xHJf0la6P7LHfpT6G66$"
+            }
+          ],
+          "skip_execution": false
+        },
+        "object_type": "definition_activity"
+      }
+    ],
+    "categories": [
+      "category_1BMfMXSnJMyt5Ihqi7rWJr5N8cf"
+    ]
+  },
+  "table_types": {
+    "tabletype_01UELHRQLYPHG4D61vZ7CqdQIi6yTHYnZaj": {
+      "unique_name": "tabletype_01UELHRQLYPHG4D61vZ7CqdQIi6yTHYnZaj",
+      "data_type": "datatype.tabletype",
+      "display_name": "SXO Relay Metric Data Tile",
+      "columns": [
+        {
+          "is_required": true,
+          "name": "icon",
+          "title": "icon",
+          "type": "string"
+        },
+        {
+          "is_required": true,
+          "name": "link",
+          "title": "link",
+          "type": "string"
+        },
+        {
+          "is_required": true,
+          "name": "metric_value",
+          "title": "metric_value",
+          "type": "integer"
+        },
+        {
+          "is_required": true,
+          "name": "title",
+          "title": "title",
+          "type": "string"
+        }
+      ],
+      "base_type": "datatype",
+      "object_type": "tabletype"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# PyCharm
+.idea/
+.idea
+
+# Python
+__pycache__/
+venv/
+
+# dotenv
+.env
+
+observe.json
+demo.json

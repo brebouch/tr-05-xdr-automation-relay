@@ -1,0 +1,145 @@
+{
+  "workflow": {
+    "unique_name": "definition_workflow_01UEPKCALEQ1O2YTe6X2VGSuuUAIV79tf9a",
+    "name": "SXO Relay Create Markdown Tile",
+    "title": "SXO Relay Create Markdown Tile",
+    "type": "generic.workflow",
+    "base_type": "workflow",
+    "variables": [
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": ",",
+          "scope": "input",
+          "name": "Line Delimination",
+          "type": "datatype.string",
+          "description": "Character or sequence used to split lines in markdown",
+          "is_required": true,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01UEPR2J9ZYU83f8xwBcKvQLlfUS2GKaNxM",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "input",
+          "name": "Input String",
+          "type": "datatype.string",
+          "description": "String to be used to populate markdown tile, needs to be line deliminated",
+          "is_required": true,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01UEPQDOQ6E7H50DscWB3vZsks7nURFc3Q5",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "tabletype_01UEPN617DDRM7Frx7QYH2TEGQmiosdrsXB",
+        "properties": {
+          "scope": "output",
+          "name": "SXO Relay Markdown Tile",
+          "type": "datatype.table",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01UEPOQA227837hBs8f7YgyzXvMO4g6WTQt",
+        "object_type": "variable_workflow"
+      }
+    ],
+    "properties": {
+      "atomic": {
+        "atomic_group": "SXO Relay Module",
+        "is_atomic": true
+      },
+      "delete_workflow_instance": false,
+      "display_name": "SXO Relay Create Markdown Tile",
+      "runtime_user": {
+        "target_default": true
+      },
+      "target": {
+        "no_target": true
+      }
+    },
+    "object_type": "definition_workflow",
+    "actions": [
+      {
+        "unique_name": "definition_activity_01UEPRDTZQE7Q1n7yHjKWiJzaDhq21N6IRi",
+        "name": "Split String",
+        "title": "Split Input",
+        "type": "core.splitstring",
+        "base_type": "activity",
+        "properties": {
+          "boundaries": [
+            {
+              "boundary": "$workflow.definition_workflow_01UEPKCALEQ1O2YTe6X2VGSuuUAIV79tf9a.input.variable_workflow_01UEPR2J9ZYU83f8xwBcKvQLlfUS2GKaNxM$"
+            }
+          ],
+          "continue_on_failure": false,
+          "display_name": "Split Input",
+          "input_string": "$workflow.definition_workflow_01UEPKCALEQ1O2YTe6X2VGSuuUAIV79tf9a.input.variable_workflow_01UEPQDOQ6E7H50DscWB3vZsks7nURFc3Q5$",
+          "remove_empty": true,
+          "skip_execution": false
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_01UEPRV5OLVGV0GkMOpgNchgDxsonBMMIyK",
+        "name": "For Each",
+        "title": "For Each",
+        "type": "logic.for_each",
+        "base_type": "activity",
+        "properties": {
+          "continue_on_failure": false,
+          "display_name": "For Each",
+          "skip_execution": false,
+          "source_array": "$activity.definition_activity_01UEPRDTZQE7Q1n7yHjKWiJzaDhq21N6IRi.output.parts$"
+        },
+        "object_type": "definition_activity",
+        "actions": [
+          {
+            "unique_name": "definition_activity_01UEPSARJDKGX3tL1l0ItWfbMgc8GN4uGP5",
+            "name": "Add Row to Table",
+            "title": "Update Markdown Output",
+            "type": "core.addrowtotable",
+            "base_type": "activity",
+            "properties": {
+              "action_timeout": 180,
+              "continue_on_failure": false,
+              "display_name": "Update Markdown Output",
+              "input_table": "$workflow.definition_workflow_01UEPKCALEQ1O2YTe6X2VGSuuUAIV79tf9a.output.variable_workflow_01UEPOQA227837hBs8f7YgyzXvMO4g6WTQt$",
+              "row": [
+                {
+                  "key": "markdown_line",
+                  "type": "string",
+                  "value": "$activity.definition_activity_01UEPRV5OLVGV0GkMOpgNchgDxsonBMMIyK.input.source_array[@]$"
+                }
+              ],
+              "skip_execution": false
+            },
+            "object_type": "definition_activity"
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "category_1BMfMXSnJMyt5Ihqi7rWJr5N8cf"
+    ]
+  },
+  "table_types": {
+    "tabletype_01UEPN617DDRM7Frx7QYH2TEGQmiosdrsXB": {
+      "unique_name": "tabletype_01UEPN617DDRM7Frx7QYH2TEGQmiosdrsXB",
+      "data_type": "datatype.tabletype",
+      "display_name": "SXO Relay Markdown Tile",
+      "columns": [
+        {
+          "name": "markdown_line",
+          "title": "markdown_line",
+          "type": "string"
+        }
+      ],
+      "base_type": "datatype",
+      "object_type": "tabletype"
+    }
+  }
+}
