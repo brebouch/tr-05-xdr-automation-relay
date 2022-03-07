@@ -63,7 +63,7 @@ class SXO:
             instance = self.sxo_get('/instances/' + instance_id)
             if instance is None:
                 return
-            if instance['status']['state'] != 'running':
+            if instance['status']['state'] != 'running' and instance['status']['state'] != 'created':
                 return instance
 
     def get_action(self, instance_id, action_id):
@@ -176,30 +176,31 @@ class SXO:
 
     def get_tile_workflow_name(self, tile_type):
         if tile_type == 'metric_group':
-            return 'SWX Relay Create Metric Tile'
+            return 'SXO Relay Create Metric Tile'
         elif tile_type == 'markdown':
             return 'SXO Relay Create Markdown Tile'
         elif  'bar_chart' in tile_type:
             return 'SXO Relay Create Bar Chart Tile'
         elif 'line_chart' in tile_type:
             return 'SXO Relay Create Line Chart Tile'
-        elif 'donut_chart' in tile_type:
-            return 'SWX Relay Create Donut Chart Tile'
+        elif 'donut_graph' in tile_type:
+            return 'SXO Relay Create Donut Tile'
 
     def run_tile_workflow(self, workflow_name, tile_type):
         tile_workflow_name = self.get_tile_workflow_name(tile_type)
         workflow = self.get_workflow(workflow_name)
         instance = self.run_workflow(workflow['workflow']['id'], {})
+        if 'actions' not in instance.keys():
+            print(str(instance))
         for a in instance['actions']:
             if a['title'] == tile_workflow_name:
                 tile_instance = self.get_action(instance['id'], a['id'])
-                if 'bar_chart' in tile_type:
-                    return tile_instance
-                for resp in tile_instance['output']['response'].values():
-                    try:
-                        return resp['data']
-                    except Exception as e:
-                        continue
+                if tile_type:
+                    for resp in tile_instance['output']['response'].values():
+                        try:
+                            return json.loads(resp)
+                        except Exception as e:
+                            continue
 
     def refresh_token(self):
         self.token = self.get_sxo_token(self.get_securex_token(self.client_id, self.client_secret))
@@ -212,8 +213,8 @@ class SXO:
         self.observe_name = auth['OBSERVE_WORKFLOW']
         self.observe_variable = auth['OBSERVE_VARIABLE']
         self.refresh_token()
-        with open('api/ao_api.json', 'r') as json_file:
-            self.ao_spec = json.load(json_file)
+        #with open('api/ao_api.json', 'r') as json_file:
+        #    self.ao_spec = json.load(json_file)
 
 
 if __name__ == '__main__':
@@ -226,6 +227,7 @@ if __name__ == '__main__':
         'OBSERVE_VARIABLE': ''
     }
     s = SXO(auth)
+    t = s.get_table("01UELOH0J8GII45MWhzUVz9Xufwd4YIUIQo")
     wf = s.get_workflow('SXO Relay Update Tile Data')
     modules = s.get_tile_modules()
     for m in modules:

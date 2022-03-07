@@ -1,0 +1,195 @@
+{
+  "workflow": {
+    "unique_name": "definition_workflow_01VH05ORN2JUM6H6avtnXQhTQd9RAiO4ScV",
+    "name": "SXO Relay Create Line Chart Tile",
+    "title": "SXO Relay Create Line Chart Tile",
+    "type": "generic.workflow",
+    "base_type": "workflow",
+    "variables": [
+      {
+        "schema_id": "tabletype_01VH023S4HYOQ5qS4uXDSzR6QWJgOLTfrmF",
+        "properties": {
+          "scope": "input",
+          "name": "Line Chart Values",
+          "type": "datatype.table",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01VH07C1UFXPQ4wYpWOwlQXI4BsAnSg9mhk",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "output",
+          "name": "Tile",
+          "type": "datatype.string",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01VH08MT2W1UU3AXkIrjfOx5vA38RvLCwb2",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "linear",
+          "scope": "input",
+          "name": "Default Scale",
+          "type": "datatype.string",
+          "is_required": true,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01VH08H82CEVF77KkAyzdLb4vfw1DrgAdNw",
+        "object_type": "variable_workflow"
+      }
+    ],
+    "properties": {
+      "atomic": {
+        "atomic_group": "SXO Relay Module",
+        "is_atomic": true
+      },
+      "delete_workflow_instance": false,
+      "display_name": "SXO Relay Create Line Chart Tile",
+      "runtime_user": {
+        "target_default": true
+      },
+      "target": {
+        "no_target": true
+      }
+    },
+    "object_type": "definition_workflow",
+    "actions": [
+      {
+        "unique_name": "definition_activity_01VH07G8352120NxtXN2wua8cA0uzSa6wdA",
+        "name": "Select from Table",
+        "title": "Select from Table",
+        "type": "core.selectfromtable",
+        "base_type": "activity",
+        "properties": {
+          "action_timeout": 180,
+          "continue_on_failure": false,
+          "display_name": "Select from Table",
+          "input_table": "$workflow.definition_workflow_01VH05ORN2JUM6H6avtnXQhTQd9RAiO4ScV.input.variable_workflow_01VH07C1UFXPQ4wYpWOwlQXI4BsAnSg9mhk$",
+          "number_of_rows": {
+            "all_rows": true
+          },
+          "persist_output": false,
+          "skip_execution": false,
+          "sorting": {
+            "no_sort": true
+          }
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_01VH05S5CFZH70KUhjjJc2Szh2kj70HGWBK",
+        "name": "Sleep",
+        "title": "Sleep",
+        "type": "core.sleep",
+        "base_type": "activity",
+        "properties": {
+          "continue_on_failure": false,
+          "display_name": "Sleep",
+          "skip_execution": false,
+          "sleep_interval": 1
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_01VH07UCRM52Y0fi9KxpkHAkqbcspK2ZDYf",
+        "name": "Execute Python Script",
+        "title": "Execute Python Script",
+        "type": "python3.script",
+        "base_type": "activity",
+        "properties": {
+          "action_timeout": 180,
+          "continue_on_failure": false,
+          "display_name": "Execute Python Script",
+          "script": "import sys\nimport json\nfrom datetime import datetime, timedelta\n\n\nclass LineChart:\n\n    def set_time(self, offset):\n        return {\n            'start_time': str(datetime.now().strftime(\"%Y-%m-%dT%H:%M:%S.%fZ\")),\n            'end_time': str((datetime.now() + timedelta(hours=offset)).strftime(\"%Y-%m-%dT%H:%M:%S.%fZ\"))\n\n        }\n\n    def get_tile_model(self):\n        return {\n            'valid_time': self.set_time(1),\n            'observed_time': self.set_time(1),\n            'cache_scope': 'org',\n            'data': []\n        }\n\n    def __init__(self, data, scale):\n        self.mod = self.get_tile_model()\n        self.mod.update({\n            'default_scale': scale,\n            'data': data\n        })\n\n\ndata = $activity.definition_activity_01VH07G8352120NxtXN2wua8cA0uzSa6wdA.output.response_body$\nscale = '$workflow.definition_workflow_01VH05ORN2JUM6H6avtnXQhTQd9RAiO4ScV.input.variable_workflow_01VH08H82CEVF77KkAyzdLb4vfw1DrgAdNw$'\nchart = LineChart(data, scale)\ntile = json.dumps(chart.mod)",
+          "script_queries": [
+            {
+              "script_query": "tile",
+              "script_query_name": "tile",
+              "script_query_type": "string"
+            }
+          ],
+          "skip_execution": false
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_01VH08PY0QL6E3aKqxnkbJjnGDcOYpcWOEd",
+        "name": "Set Variables",
+        "title": "Set Variables",
+        "type": "core.set_multiple_variables",
+        "base_type": "activity",
+        "properties": {
+          "continue_on_failure": false,
+          "display_name": "Set Variables",
+          "skip_execution": false,
+          "variables_to_update": [
+            {
+              "variable_to_update": "$workflow.definition_workflow_01VH05ORN2JUM6H6avtnXQhTQd9RAiO4ScV.output.variable_workflow_01VH08MT2W1UU3AXkIrjfOx5vA38RvLCwb2$",
+              "variable_value_new": "$activity.definition_activity_01VH07UCRM52Y0fi9KxpkHAkqbcspK2ZDYf.output.script_queries.tile$"
+            }
+          ]
+        },
+        "object_type": "definition_activity"
+      }
+    ],
+    "categories": [
+      "category_01EI33LMFFL7N5eTQLsOOJIrxdlSOHb7r3r"
+    ]
+  },
+  "categories": {
+    "category_01EI33LMFFL7N5eTQLsOOJIrxdlSOHb7r3r": {
+      "unique_name": "category_01EI33LMFFL7N5eTQLsOOJIrxdlSOHb7r3r",
+      "name": "SecureX",
+      "title": "SecureX",
+      "type": "basic.category",
+      "base_type": "category",
+      "category_type": "custom",
+      "object_type": "category"
+    }
+  },
+  "table_types": {
+    "tabletype_01VH023S4HYOQ5qS4uXDSzR6QWJgOLTfrmF": {
+      "unique_name": "tabletype_01VH023S4HYOQ5qS4uXDSzR6QWJgOLTfrmF",
+      "data_type": "datatype.tabletype",
+      "display_name": "SXO Relay Line Chart Data",
+      "columns": [
+        {
+          "is_required": true,
+          "name": "key",
+          "title": "Key",
+          "type": "string"
+        },
+        {
+          "is_required": true,
+          "name": "value",
+          "title": "Value",
+          "type": "integer"
+        },
+        {
+          "name": "observables",
+          "title": "Observables",
+          "type": "string"
+        },
+        {
+          "name": "link_uri",
+          "title": "Link",
+          "type": "string"
+        },
+        {
+          "name": "tooltip",
+          "title": "Tooltip",
+          "type": "string"
+        }
+      ],
+      "base_type": "datatype",
+      "object_type": "tabletype"
+    }
+  }
+}

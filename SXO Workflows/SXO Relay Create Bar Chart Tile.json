@@ -1,0 +1,213 @@
+{
+  "workflow": {
+    "unique_name": "definition_workflow_01UT75LBBQP4I1109SMp64Z0quwLY8lJWRE",
+    "name": "SXO Relay Create Bar Chart Tile",
+    "title": "SXO Relay Create Bar Chart Tile",
+    "type": "generic.workflow",
+    "base_type": "workflow",
+    "variables": [
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "input",
+          "name": "Key Type",
+          "type": "datatype.string",
+          "is_required": true,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01VBPREMMLFJU7gy6GqwREsFcxKfctRLxKe",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "tabletype_01VB4IP4F3URI3kega0JQ5cTE75obMzfTxC",
+        "properties": {
+          "scope": "input",
+          "name": "Chart Values",
+          "type": "datatype.table",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01VB4JHG46DMR2JBAjTr5EQtrn20lRjnZob",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "Default",
+          "scope": "input",
+          "name": "Color Scale",
+          "type": "datatype.string",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01VBPRN08IOL45Rics6Q3ggOk22imBWuwRO",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "output",
+          "name": "Tile",
+          "type": "datatype.string",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01UU3YV3ZWTNM1KEHrfqsRyINQqxwzqgyPe",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "Default",
+          "scope": "input",
+          "name": "X-Unit",
+          "type": "datatype.string",
+          "is_required": false,
+          "is_invisible": false
+        },
+        "unique_name": "variable_workflow_01VBPRVG7D9NX0p4DCw6YHG71qCwvy94G2h",
+        "object_type": "variable_workflow"
+      }
+    ],
+    "properties": {
+      "atomic": {
+        "atomic_group": "SXO Relay Module",
+        "is_atomic": true
+      },
+      "delete_workflow_instance": false,
+      "display_name": "SXO Relay Create Bar Chart Tile",
+      "runtime_user": {
+        "target_default": true
+      },
+      "target": {
+        "no_target": true
+      }
+    },
+    "object_type": "definition_workflow",
+    "actions": [
+      {
+        "unique_name": "definition_activity_01VBPSD5ZNPF57GzEoXxFIi7CGoQhCwX2f2",
+        "name": "Select from Table",
+        "title": "Convert Table to JSON",
+        "type": "core.selectfromtable",
+        "base_type": "activity",
+        "properties": {
+          "action_timeout": 180,
+          "continue_on_failure": false,
+          "display_name": "Convert Table to JSON",
+          "input_table": "$workflow.definition_workflow_01UT75LBBQP4I1109SMp64Z0quwLY8lJWRE.input.variable_workflow_01VB4JHG46DMR2JBAjTr5EQtrn20lRjnZob$",
+          "number_of_rows": {
+            "all_rows": true
+          },
+          "persist_output": false,
+          "skip_execution": false,
+          "sorting": {
+            "no_sort": true
+          }
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_01VBPW6ZM2SI70StOZch9TVLKo76JyrJAxd",
+        "name": "Execute Python Script",
+        "title": "Create Tile Response",
+        "type": "python3.script",
+        "base_type": "activity",
+        "properties": {
+          "action_timeout": 180,
+          "continue_on_failure": false,
+          "display_name": "Create Tile Response",
+          "script": "import sys\nimport json\nfrom datetime import datetime, timedelta\n\n\nclass BarChart:\n\n    def set_time(self, offset):\n        return {\n            'start_time': str(datetime.now().strftime(\"%Y-%m-%dT%H:%M:%S.%fZ\")),\n            'end_time': str((datetime.now() + timedelta(hours=offset)).strftime(\"%Y-%m-%dT%H:%M:%S.%fZ\"))\n\n        }\n\n    def get_tile_model(self):\n        return {\n            'valid_time': self.set_time(1),\n            'observed_time': self.set_time(1),\n            'cache_scope': 'org',\n            'data': []\n        }\n\n    def __init__(self, key_type, keys, data, color_scale, x_unit):\n        self.mod = self.get_tile_model()\n        self.mod.update({\n            'key_type': key_type,\n            'keys': keys,\n            'data': data\n        })\n        if color_scale != 'Default':\n            self.mod.update({'color_scale': color_scale})\n        if x_unit != 'Default':\n            self.mod.update({'x_unit': x_unit})\n\n\ndata = $activity.definition_activity_01VBPSD5ZNPF57GzEoXxFIi7CGoQhCwX2f2.output.response_body$\nseen_keys = []\nkeys = []\nlabels = []\nitems = []\n\ndef create_values(item):\n    response = {'key': item['key'], 'value': item['value']}\n    if 'link_uri' in item.keys():\n        if item['link_uri'] != '':\n            response.update({'link_uri': item['link_uri']})\n    if 'tooltip' in item.keys():\n        if item['tooltip'] != '':\n            response.update({'tooltip': item['tooltip']})\n    try:\n        observe = json.loads(item['observables'])\n        response.update({'observables': observe})\n    except:\n        pass\n    return response\n\nfor d in data:\n    values = create_values(d)\n    if d['key'] not in seen_keys:\n        seen_keys.append(d['key'])\n        keys.append({\n            'key': d['key'],\n            'label': d['key'].capitalize()\n        })\n    if d['label'] not in labels:\n        labels.append(d['label'])\n        items.append({\n            'key': d['label'],\n            'label': d['label'].capitalize(),\n            'value': d['value'],\n            'values': [values]\n        })\n    else:\n        for i in items:\n            if i['key'] == d['label']:\n                i['value'] += d['value']\n                i['values'].append(values)\n\nchart = BarChart('$workflow.definition_workflow_01UT75LBBQP4I1109SMp64Z0quwLY8lJWRE.input.variable_workflow_01VBPREMMLFJU7gy6GqwREsFcxKfctRLxKe$', keys, items, '$workflow.definition_workflow_01UT75LBBQP4I1109SMp64Z0quwLY8lJWRE.input.variable_workflow_01VBPRN08IOL45Rics6Q3ggOk22imBWuwRO$', '$workflow.definition_workflow_01UT75LBBQP4I1109SMp64Z0quwLY8lJWRE.input.variable_workflow_01VBPRVG7D9NX0p4DCw6YHG71qCwvy94G2h$')\noutput = json.dumps(chart.mod)",
+          "script_queries": [
+            {
+              "script_query": "output",
+              "script_query_name": "bar_chart_json",
+              "script_query_type": "string"
+            }
+          ],
+          "skip_execution": false
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_01VBPXILQY86Y3CgPS1uhbDbIXoMu4ZS81P",
+        "name": "Set Variables",
+        "title": "Set Tile Output",
+        "type": "core.set_multiple_variables",
+        "base_type": "activity",
+        "properties": {
+          "continue_on_failure": false,
+          "display_name": "Set Tile Output",
+          "skip_execution": false,
+          "variables_to_update": [
+            {
+              "variable_to_update": "$workflow.definition_workflow_01UT75LBBQP4I1109SMp64Z0quwLY8lJWRE.output.variable_workflow_01UU3YV3ZWTNM1KEHrfqsRyINQqxwzqgyPe$",
+              "variable_value_new": "$activity.definition_activity_01VBPW6ZM2SI70StOZch9TVLKo76JyrJAxd.output.script_queries.bar_chart_json$"
+            }
+          ]
+        },
+        "object_type": "definition_activity"
+      }
+    ],
+    "categories": [
+      "category_01EI33LMFFL7N5eTQLsOOJIrxdlSOHb7r3r"
+    ]
+  },
+  "categories": {
+    "category_01EI33LMFFL7N5eTQLsOOJIrxdlSOHb7r3r": {
+      "unique_name": "category_01EI33LMFFL7N5eTQLsOOJIrxdlSOHb7r3r",
+      "name": "SecureX",
+      "title": "SecureX",
+      "type": "basic.category",
+      "base_type": "category",
+      "category_type": "custom",
+      "object_type": "category"
+    }
+  },
+  "table_types": {
+    "tabletype_01VB4IP4F3URI3kega0JQ5cTE75obMzfTxC": {
+      "unique_name": "tabletype_01VB4IP4F3URI3kega0JQ5cTE75obMzfTxC",
+      "data_type": "datatype.tabletype",
+      "display_name": "SecureX Bar Chart Data Values",
+      "columns": [
+        {
+          "name": "observables",
+          "title": "observables",
+          "type": "string"
+        },
+        {
+          "name": "link_uri",
+          "title": "link_uri",
+          "type": "string"
+        },
+        {
+          "is_required": true,
+          "name": "label",
+          "title": "label",
+          "type": "string"
+        },
+        {
+          "is_required": true,
+          "name": "key",
+          "title": "key",
+          "type": "string"
+        },
+        {
+          "is_required": true,
+          "name": "value",
+          "title": "value",
+          "type": "integer"
+        },
+        {
+          "name": "tooltip",
+          "title": "tooltip",
+          "type": "string"
+        }
+      ],
+      "base_type": "datatype",
+      "object_type": "tabletype"
+    }
+  }
+}

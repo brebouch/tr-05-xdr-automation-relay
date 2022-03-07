@@ -9,21 +9,6 @@ from api.sxo import SXO
 
 dashboard_api = Blueprint('dashboard', __name__)
 
-
-def parse_output_table(table):
-    response = []
-    for t in table['output']['response'].values():
-        try:
-            response.append(t['data'])
-        except:
-            try:
-                response.append(json.loads(t))
-            except:
-                continue
-    if len(response) == 1:
-        return response[0]
-    return response
-
 def create_periods(row):
     response = []
     if row['column_data']['last_hour']:
@@ -59,57 +44,12 @@ def get_timeframe(req):
     return 1
 
 
-def create_metric_tile_data(tile_list):
-    response = api.utils.get_tile_model()
-    for t in tile_list:
-        response['data'].append(
-            api.utils.set_metric_tile_data(
-                t['columndata']['title'],
-                t['columndata']['icon'],
-                t['columndata']['link'],
-                t['columndata']['metric_value'],
-            )
-        )
-    return response
-
-
-def create_bar_tile_data(tile_list):
-    keys = []
-    values = []
-    tile_data = {}
-    response = api.utils.get_tile_model()
-    output = parse_output_table(tile_list)
-    for t in tile_list:
-        response['data'].append(
-            api.utils.set_metric_tile_data(
-                t['columndata']['title'],
-                t['columndata']['icon'],
-                t['columndata']['link'],
-                t['columndata']['metric_value'],
-            )
-        )
-    return response
-
-def create_markdown_tile_data(tile_list):
-    response = api.utils.get_tile_model()
-    for t in tile_list:
-        response['data'].append(t['columndata']['markdown_line'])
-    return response
-
-
 
 def get_tile_data(sxo, req):
     modules = get_tile_modules(sxo)
     for m in modules:
         if m['id'] == req['tile_id']:
-            tile = sxo.run_tile_workflow(req['tile_id'], m['type'])
-            if m['type'] == 'metric_group':
-                return create_metric_tile_data(tile)
-            if m['type'] == 'markdown':
-                return create_markdown_tile_data(tile)
-            if 'bar_chart' in m['type']:
-                return create_bar_tile_data(tile)
-
+            return sxo.run_tile_workflow(req['tile_id'], m['type'])
 
 
 @dashboard_api.route('/tiles', methods=['POST'])
