@@ -13,11 +13,15 @@ enrich_api = Blueprint('enrich', __name__)
 get_observables = partial(get_json, schema=ObservableSchema(many=True))
 
 
-def get_disposition(status=2):
-    if status==1:
+def get_disposition(status):
+    if status.lower() == 'malicious':
         return current_app.config['DISPOSITIONS']['malicious']
-    elif status==0:
+    elif status.lower() == 'suspicious':
+        return current_app.config['DISPOSITIONS']['suspicious']
+    elif status.lower() == 'clean':
         return current_app.config['DISPOSITIONS']['clean']
+    elif status.lower() == 'common':
+        return current_app.config['DISPOSITIONS']['common']
     else:
         return current_app.config['DISPOSITIONS']['unknown']
 

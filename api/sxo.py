@@ -7,6 +7,7 @@ import sys
 class SXO:
     sxo_url = 'https://securex-ao.us.security.cisco.com/be-console/api/v1'
     token = ''
+    securex_token = ''
 
     def get_securex_token(self, i, s):
         url = 'https://visibility.amp.cisco.com/iroh/oauth2/token'
@@ -90,6 +91,22 @@ class SXO:
         workflow = self.get_workflows_config(workflow_name)
         start_config = self.sxo_get('/workflows/start_config?workflow_id=' + workflow['id'])
         return {'workflow': workflow, 'start_config': start_config}
+
+    def get_workflow_category(self, category):
+        cats = self.sxo_get('/categories')
+        for c in cats:
+            if c['name'] == category:
+                return c['id']
+
+
+    def get_workflow_by_category(self, category):
+        cat_id = self.get_workflow_category(category)
+        workflows = self.sxo_get('/workflows?is_atomic=false')
+        response = []
+        for w in workflows:
+            if cat_id in w['categories']:
+                response.append(w)
+        return response
     
     def get_deliberation(self, observable_type, observable_value):
         wf = self.get_workflow(self.deliberate_name)
@@ -135,6 +152,31 @@ class SXO:
                             '&offset=' + str(offset) +
                             '&rows=' + str(rows))
 
+    def get_table_types(self):
+        return self.sxo_get('/table_types/')
+
+    def get_tile_table_types(self, tt='SXO Relay Dashboard Tiles'):
+        updated_tables = []
+        table_type_id = ''
+        table_types = self.get_table_types()
+        for t in table_types:
+            if t['display_name'] == tt:
+                table_type_id = t['id']
+        variables = self.get_variables()
+        for v in variables:
+            if v['properties']['type'] == 'datatype.table':
+                check_table = self.get_table(self.get_variable_by_id(v['id'])['table_id'])
+                if check_table['table_type_id'] == table_type_id:
+                    updated_tables.append({'value': check_table['name'], 'label': check_table['name']})
+        return updated_tables
+
+    def get_workflow_table(self, table_id, workflow_id, instance_id, offset=0, rows=1000):
+        return self.sxo_get('/tables/' + table_id +
+                            '?workflow_id=' + workflow_id +
+                            '&offset=' + str(offset) +
+                            '&rows=' + str(rows) +
+                            '&workflow_instance_id=' + instance_id)
+
     def get_variable(self, variable_name):
         variables = self.get_variables()
         for v in variables:
@@ -149,7 +191,7 @@ class SXO:
 
     def get_tile_modules(self):
         tiles = []
-        tile_table = self.get_variable('SXO Relay Dashboard Tiles')
+        tile_table = self.get_variable(self.tile_table)
         for t in tile_table['rows']:
             try:
                 tile = [t['column_data']['title'], t['column_data']['dashboard_type'],
@@ -202,16 +244,28 @@ class SXO:
                         except Exception as e:
                             continue
 
+    def run_tile_wf(self, workflow_name):
+        workflow = self.get_workflow(workflow_name)
+        instance = self.run_workflow(workflow['workflow']['id'], {})
+        for v in instance['variables']:
+            if v['properties']['scope'] == 'output' and v['properties']['type'] == 'datatype.table':
+                table = self.get_workflow_table(v['table_id'],
+                                                workflow['workflow']['id'],
+                                                instance['id'])
+                return {'instance': instance, 'table_rows': table['rows']}
+
     def refresh_token(self):
-        self.token = self.get_sxo_token(self.get_securex_token(self.client_id, self.client_secret))
+        self.securex_token = self.get_securex_token(self.client_id, self.client_secret)
+        self.token = self.get_sxo_token(self.securex_token)
 
     def __init__(self, auth):
         self.client_id = auth['API_CLIENT']
         self.client_secret = auth['API_SECRET']
+        self.tile_table = auth['TILE_TABLE']
         self.deliberate_name = auth['DELIBERATE_WORKFLOW']
-        self.deliberate_variable = auth['DELIBERATE_VARIABLE']
+        self.deliberate_variable = 'Judgement'
         self.observe_name = auth['OBSERVE_WORKFLOW']
-        self.observe_variable = auth['OBSERVE_VARIABLE']
+        self.observe_variable = 'observe_json'
         self.refresh_token()
         #with open('api/ao_api.json', 'r') as json_file:
         #    self.ao_spec = json.load(json_file)
@@ -227,8 +281,9 @@ if __name__ == '__main__':
         'OBSERVE_VARIABLE': ''
     }
     s = SXO(auth)
-    t = s.get_table("01UELOH0J8GII45MWhzUVz9Xufwd4YIUIQo")
-    wf = s.get_workflow('SXO Relay Update Tile Data')
+    #t = s.get_table("01UELOH0J8GII45MWhzUVz9Xufwd4YIUIQo")
+    wf = s.run_tile_wf('SXO Metric Tile')
+    instance = s.run_workflow(wf['workflow']['id'], {})
     modules = s.get_tile_modules()
     for m in modules:
         t = s.run_tile_workflow(m[5], m[1])
@@ -237,7 +292,7 @@ if __name__ == '__main__':
     data = {}
     #for i in range(len(wf['start_config']['input_variables'])):
     #    data.update({wf['start_config']['input_variables'][i]['id']: 'Test: ' + str(i)})
-    instance = s.run_workflow(wf['workflow']['id'], data)
+
     #w = sxo_post('.1/workflows/ui/start?workflow_id=01U61ZH5071EG7GSRgott0DkcQzW4nGamXC', sxo_token, json.dumps(data))
     #instance = sxo_get('/instances/01UDQ1BIY5R5K5SLabTz41vAynSYF8LNqHK', sxo_token)
     print('hi')

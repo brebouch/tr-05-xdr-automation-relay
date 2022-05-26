@@ -49,6 +49,11 @@ def get_jwt():
         return jwks_host
     except tuple(expected_errors) as error:
         raise AuthorizationError(expected_errors[error.__class__])
+    
+    
+def get_instance():
+    instance = request.headers.environ['HTTP_X_MODULE_INSTANCE_ID']
+    return instance
 
 
 def get_json(schema):
