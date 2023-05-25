@@ -90,12 +90,8 @@ class DonutChart:
 
 
 
-
-
-
-
 class MarkdownTile:
-
+    
     def set_time(self, offset):
         return {
             'start_time': str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
@@ -114,10 +110,6 @@ class MarkdownTile:
     def generate_tile(self, data):
         self.mod = self.get_tile_model()
         self.mod['data'] = data
-
-
-
-
 
 icon_types = [
     'device-type',

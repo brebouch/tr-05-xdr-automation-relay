@@ -24,9 +24,14 @@ def check_logo(auth):
         
         
 def check_config_spec(current_config, workflows):
-    cfg = [current_config[0]]
+    cfg = []
     for w in workflows:
         cfg.append({'value': w['name'], 'label': w['name']})
+    if len(cfg) == 0:
+        cfg = [{
+                    "value": "Select Available Workflow",
+                    "label": "Select Available Workflow"
+                }]
     return cfg
 
 

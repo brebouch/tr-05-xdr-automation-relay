@@ -155,11 +155,48 @@ def tile():
     _ = get_json(DashboardTileSchema())
     return jsonify_data({})
 
+@dashboard_api.route('/assets/describe', methods=['POST'])
+def describe():
+    _ = get_jwt()
+    _ = get_json(DashboardTileSchema())
+    return jsonify_data({})
+
+
+@dashboard_api.route('/assets/resolve-latest', methods=['POST'])
+def resolve_latest():
+    _ = get_jwt()
+    _ = get_json(DashboardTileSchema())
+    return jsonify_data({})
+
+
+@dashboard_api.route('/assets/resolve', methods=['POST'])
+def resolve():
+    _ = get_jwt()
+    _ = get_json(DashboardTileSchema())
+    return jsonify_data({})
+
+
+@dashboard_api.route('/vault/list-configs', methods=['POST'])
+def vault():
+    _ = get_jwt()
+    _ = get_json(DashboardTileSchema())
+    return jsonify_data({})
+
+@dashboard_api.route('/target-records/translate', methods=['POST'])
+def translate():
+    _ = get_jwt()
+    _ = get_json(DashboardTileSchema())
+    return jsonify_data({})
+
+
 
 @dashboard_api.route('/tiles/tile-data', methods=['POST'])
 def tile_data():
     auth = get_jwt()
-    sxo = SXO(auth)
+    try:
+        sxo = SXO(auth)
+    except Exception as e:
+        pass
     req = get_json(DashboardTileDataSchema())
     return jsonify_data(get_tile_data(sxo, req))
 

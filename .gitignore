@@ -15,3 +15,4 @@ venv/
 observe.json
 demo.json
 /sxo-relay-project-prod-template-1646081642.json
+local_zappa_settings.json

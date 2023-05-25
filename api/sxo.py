@@ -168,6 +168,11 @@ class SXO:
                 check_table = self.get_table(self.get_variable_by_id(v['id'])['table_id'])
                 if check_table['table_type_id'] == table_type_id:
                     updated_tables.append({'value': check_table['name'], 'label': check_table['name']})
+        if len(updated_tables) == 0:
+            updated_tables = [{
+                    "value": "Select Available Table",
+                    "label": "Select Available Table"
+                }]
         return updated_tables
 
     def get_workflow_table(self, table_id, workflow_id, instance_id, offset=0, rows=1000):

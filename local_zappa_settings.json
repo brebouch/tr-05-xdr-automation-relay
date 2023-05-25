@@ -11,7 +11,7 @@
     "memory_size": 4096,
     "timeout_seconds": 90,
     "environment_variables": {
-      "SECRET_KEY": ""
+      "SECRET_KEY": "VCVPyVK0ChQgiXPlutSbo8XwX48v6wQuc7wLhterp13cOGtGMu0IWywkOTHlVGQU"
     }
   },
     "dev": {
@@ -26,7 +26,7 @@
       "memory_size": 4096,
       "timeout_seconds": 90,
       "environment_variables": {
-        "SECRET_KEY": ""
+        "SECRET_KEY": "VCVPyVK0ChQgiXPlutSbo8XwX48v6wQuc7wLhterp13cOGtGMu0IWywkOTHlVGQU"
       }
     },
       "eu": {

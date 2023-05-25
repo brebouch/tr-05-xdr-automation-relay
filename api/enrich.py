@@ -1,5 +1,5 @@
 from functools import partial
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, request
 import json
 
 import api.utils
@@ -160,32 +160,41 @@ def group_observables(relay_input):
 def deliberate_observables():
     auth = get_jwt()
     sxo = SXO(auth)
-    response = {'verdicts': [], 'judgements': []}
+    response = {'verdicts': {}, 'judgements': {}}
     ob = group_observables(get_observables())
     valid_time = api.utils.set_time(1)
     for o in ob:
-        disposition = get_disposition(sxo.get_deliberation(o['type'], o['value']))
-        if disposition:
-            response['verdicts'].append(get_verdict(o['value'], o['type'], disposition, valid_time))
-            response['judgements'].append(get_judgement(o['value'], o['type'], disposition, valid_time))
+        try:
+            disposition = get_disposition(sxo.get_deliberation(o['type'], o['value']))
+            if disposition:
+                response['verdicts'].append(get_verdict(o['value'], o['type'], disposition, valid_time))
+                response['judgements'].append(get_judgement(o['value'], o['type'], disposition, valid_time))
+        except:
+            continue
+    if not response['verdicts'] and not response['judgements']:
+        return jsonify_data({})
     if response['verdicts']:
         response['verdicts'] = format_docs(response['verdicts'])
-    if response['judgements']:
+    if response['verdicts']:
         response['judgements'] = format_docs(response['judgements'])
     return jsonify_data(response)
 
 
 @enrich_api.route('/observe/observables', methods=['POST'])
 def observe_observables():
+    r = request
     response = get_model()
     auth = get_jwt()
     sxo = SXO(auth)
     ob = group_observables(get_observables())
     for o in ob:
-        observe = json.loads(sxo.get_observation(o['type'], o['value']))
-        if observe:
-            response['sightings']['count'] += 1
-            response['sightings']['docs'].append(observe)
+        try:
+            observe = json.loads(sxo.get_observation(o['type'], o['value']))
+            if observe:
+                response['sightings']['count'] += 1
+                response['sightings']['docs'].append(observe)
+        except:
+            continue
     return jsonify_data(response)
 
 
