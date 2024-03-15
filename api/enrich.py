@@ -5,7 +5,7 @@ import json
 import api.utils
 from api.schemas import ObservableSchema
 from api.utils import get_json, get_jwt, jsonify_data, format_docs
-from api.sxo import SXO
+from api.xdr_automate import XdrAutomate
 from uuid import uuid4
 
 enrich_api = Blueprint('enrich', __name__)
@@ -53,7 +53,7 @@ def get_verdict(observable_value, observable_type, disposition, valid_time):
 
 def get_judgement(observable_value, observable_type, disposition, valid_time):
     # Prepare Judgement reply
-    source_uri = 'https://securex-ao.us.security.cisco.com/orch-ui'
+    source_uri = 'https://xdr.us.security.cisco.com/automate'
 
     return {
         'id': f'transient:judgement-{uuid4()}',
@@ -62,7 +62,7 @@ def get_judgement(observable_value, observable_type, disposition, valid_time):
         'disposition_name': disposition[1],
         'type': 'judgement',
         'schema_version': '1.0.1',
-        'source': 'Patrick Generic Serverless Relay',
+        'source': 'Cisco XDR Automate Relay',
         'confidence': 'Low',
         'priority': 90,
         'severity': 'Medium',
@@ -80,7 +80,7 @@ def set_observable(ip):
 
 def set_relation(src, dst, relation):
     return {
-        "origin": "Thousand Eyes Agent",
+        "origin": "Cisco XDR Automate Relay",
         "relation": relation,
         "source": {
             "value": src,
@@ -95,14 +95,14 @@ def set_relation(src, dst, relation):
 
 def get_doc():
     return {
-        "description": "Thousand Eyes Relay Doc",
+        "description": "Cisco XDR Automate Relay Doc",
         "schema_version": "1.1.3",
         "relations": [
         ],
         "observables": [
         ],
         "type": "sighting",
-        "source": "Thousand Eyes",
+        "source": "Cisco XDR Automate",
         "targets": [
         ],
         "resolution": "detected",
@@ -159,13 +159,13 @@ def group_observables(relay_input):
 @enrich_api.route('/deliberate/observables', methods=['POST'])
 def deliberate_observables():
     auth = get_jwt()
-    sxo = SXO(auth)
+    automate = XdrAutomate(auth)
     response = {'verdicts': {}, 'judgements': {}}
     ob = group_observables(get_observables())
     valid_time = api.utils.set_time(1)
     for o in ob:
         try:
-            disposition = get_disposition(sxo.get_deliberation(o['type'], o['value']))
+            disposition = get_disposition(automate.get_deliberation(o['type'], o['value']))
             if disposition:
                 response['verdicts'].append(get_verdict(o['value'], o['type'], disposition, valid_time))
                 response['judgements'].append(get_judgement(o['value'], o['type'], disposition, valid_time))
@@ -185,11 +185,11 @@ def observe_observables():
     r = request
     response = get_model()
     auth = get_jwt()
-    sxo = SXO(auth)
+    automate = XdrAutomate(auth)
     ob = group_observables(get_observables())
     for o in ob:
         try:
-            observe = json.loads(sxo.get_observation(o['type'], o['value']))
+            observe = json.loads(automate.get_observation(o['type'], o['value']))
             if observe:
                 response['sightings']['count'] += 1
                 response['sightings']['docs'].append(observe)

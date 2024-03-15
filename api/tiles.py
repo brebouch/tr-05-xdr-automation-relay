@@ -1,5 +1,3 @@
-
-import sys
 import json
 from datetime import datetime, timedelta
 
@@ -34,6 +32,7 @@ class DonutChart:
     data = []
     labels = [[], []]
     tile_data = []
+
     def set_time(self, offset):
         return {
             'start_time': str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
@@ -74,7 +73,6 @@ class DonutChart:
             segment = {'key': inner_lookup, 'value': d['value']}
             self.tile_data[outer_lookup]['segments'].append(segment)
 
-
     def generate_tile(self, data, inner_label, outer_label):
         self.mod = self.get_tile_model()
         self.data = data
@@ -83,15 +81,14 @@ class DonutChart:
             'data': self.tile_data,
             'labels': self.labels,
             'label_headers': [
-                                outer_label,
-                                inner_label
-                              ]
+                outer_label,
+                inner_label
+            ]
         })
 
 
-
 class MarkdownTile:
-    
+
     def set_time(self, offset):
         return {
             'start_time': str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
@@ -111,6 +108,7 @@ class MarkdownTile:
         self.mod = self.get_tile_model()
         self.mod['data'] = data
 
+
 icon_types = [
     'device-type',
     'bulleted-list',
@@ -126,6 +124,7 @@ icon_types = [
     'umbrella',
     'block'
 ]
+
 
 class MetricTile:
 
@@ -230,68 +229,3 @@ class BarChart:
             self.mod.update({'color_scale': color_scale})
         if x_unit != 'Default':
             self.mod.update({'x_unit': x_unit})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

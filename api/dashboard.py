@@ -1,26 +1,24 @@
 import json
-from datetime import datetime, timedelta
+
 from flask import Blueprint
-from api.schemas import DashboardTileSchema, DashboardTileDataSchema
-from api.utils import jsonify_data, get_jwt, get_json
+
 import api.utils
-from api.sxo import SXO
-from api.tiles import LineChart
+from api.schemas import DashboardTileSchema, DashboardTileDataSchema
+from api.tiles import BarChart
 from api.tiles import DonutChart
+from api.tiles import LineChart
 from api.tiles import MarkdownTile
 from api.tiles import MetricTile
-from api.tiles import BarChart
-
-
+from api.utils import jsonify_data, get_jwt, get_json
+from api.xdr_automate import XdrAutomate
 
 dashboard_api = Blueprint('dashboard', __name__)
+
 
 def create_periods(row):
     response = []
     if row['column_data']['last_hour']:
         response.append('last_hour')
-    if row['column_data']['last_24_hours']:
-        response.append('last_24_hours')
     if row['column_data']['last_24_hours']:
         response.append('last_24_hours')
     if row['column_data']['last_7_days']:
@@ -32,11 +30,13 @@ def create_periods(row):
     return response
 
 
-def get_tile_modules(sxo):
-    table = sxo.get_tile_modules()
+def get_tile_modules(automate):
+    table = automate.get_tile_modules()
+    print(f"Table: {json.dumps(table)}")
     response = []
     for t in table:
         response.append(api.utils.set_tile(t))
+    print(json.dumps(response))
     return response
 
 
@@ -118,10 +118,19 @@ def get_markdown_tile(tile_data):
     return tile.mod
 
 
-def get_tile_data(sxo, req):
-    wf = sxo.run_tile_wf(req['tile_id'])
+def get_data_table_tile(tile_data):
+    tile = MarkdownTile()
+    data = []
+    for r in tile_data['table_rows']:
+        data.append(r['column_data']['item'])
+    tile.generate_tile(data)
+    return tile.mod
+
+
+def get_tile_data(automate, req):
+    wf = automate.run_tile_wf(req['tile_id'])
     mod_type = ''
-    modules = sxo.get_tile_modules()
+    modules = automate.get_tile_modules()
     for m in modules:
         if m[5] == req['tile_id']:
             mod_type = m[1]
@@ -131,7 +140,7 @@ def get_tile_data(sxo, req):
         return get_markdown_tile(wf)
     elif 'bar_chart' in mod_type:
         return get_bar_graph_tile(wf)
-    elif  mod_type == 'line_chart':
+    elif mod_type == 'line_chart':
         return get_line_chart_tile(wf)
     elif mod_type == 'donut_graph':
         return get_donut_tile(wf)
@@ -143,8 +152,8 @@ def get_tile_data(sxo, req):
 def tiles():
     try:
         auth = get_jwt()
-        sxo = SXO(auth)
-        return jsonify_data(get_tile_modules(sxo))
+        automate = XdrAutomate(auth)
+        return jsonify_data(get_tile_modules(automate))
     except Exception as e:
         return jsonify_data([])
 
@@ -154,6 +163,7 @@ def tile():
     _ = get_jwt()
     _ = get_json(DashboardTileSchema())
     return jsonify_data({})
+
 
 @dashboard_api.route('/assets/describe', methods=['POST'])
 def describe():
@@ -182,6 +192,7 @@ def vault():
     _ = get_json(DashboardTileSchema())
     return jsonify_data({})
 
+
 @dashboard_api.route('/target-records/translate', methods=['POST'])
 def translate():
     _ = get_jwt()
@@ -189,14 +200,12 @@ def translate():
     return jsonify_data({})
 
 
-
 @dashboard_api.route('/tiles/tile-data', methods=['POST'])
 def tile_data():
     auth = get_jwt()
     try:
-        sxo = SXO(auth)
+        automate = XdrAutomate(auth)
+        req = get_json(DashboardTileDataSchema())
+        return jsonify_data(get_tile_data(automate, req))
     except Exception as e:
-        pass
-    req = get_json(DashboardTileDataSchema())
-    return jsonify_data(get_tile_data(sxo, req))
-
+        return jsonify_data({})

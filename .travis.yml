@@ -5,7 +5,7 @@ python:
 
 install:
 - pip install --upgrade --requirement requirements.txt
-- pip install --upgrade --requirement test-requirements.txt
+- pip install --upgrade --requirement test.py-requirements.txt
 
 script:
 - flake8 .

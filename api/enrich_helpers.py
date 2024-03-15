@@ -1,12 +1,18 @@
 import uuid
 from datetime import datetime, timedelta
 
+from flask import current_app
+
+import api.utils
+
+
 def set_time(offset):
     return {
         'start_time': str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
         'end_time': str((datetime.now() + timedelta(hours=offset)).strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
 
     }
+
 
 def get_disposition(status):
     if status.lower() == 'malicious':
@@ -47,9 +53,8 @@ def get_verdict(observable_value, observable_type, disposition, valid_time):
 
 
 def get_judgement(source_uri, observable_value, observable_type, disposition, valid_time):
-
     return {
-        'id': f'transient:judgement-{uuid4()}',
+        'id': f'transient:judgement-{uuid.uuid4()}',
         'observable': {'value': observable_value, 'type': observable_type},
         'disposition': disposition[0],
         'disposition_name': disposition[1],
@@ -66,9 +71,9 @@ def get_judgement(source_uri, observable_value, observable_type, disposition, va
 
 def set_observable(observable_type, observable_value):
     return {
-                "value": observable_value,
-                "type": observable_type
-            }
+        "value": observable_value,
+        "type": observable_type
+    }
 
 
 def set_relation(src, dst, relation, origin):
@@ -113,7 +118,7 @@ def get_sighting_doc(source, description):
         "resolution": "detected",
         "internal": True,
         "count": 1,
-        "id": f'transient:sighting-{uuid4()}',
+        "id": f'transient:sighting-{uuid.uuid4()}',
         "severity": "Unknown",
         "tlp": "white",
         "confidence": "High",
@@ -125,12 +130,11 @@ def get_sighting_doc(source, description):
     }
 
 
-
 def get_model():
     return {
-            "sightings": {
-                "count": 0,
-                "docs": [
-                ]
-            }
+        "sightings": {
+            "count": 0,
+            "docs": [
+            ]
         }
+    }

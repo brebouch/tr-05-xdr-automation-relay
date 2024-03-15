@@ -1,6 +1,6 @@
 from flask import Blueprint
-from api.sxo import SXO
-import api.securex as securex
+from api.xdr_automate import XdrAutomate
+import api.xdr as xdr
 
 from api.utils import get_jwt, jsonify_data, get_instance
 
@@ -8,7 +8,7 @@ health_api = Blueprint('health', __name__)
 
 def check_logo(auth):
     instance = get_instance()
-    sec = securex.SecureX(auth['API_CLIENT'], auth['API_SECRET'])
+    sec = xdr.XDR(auth['API_CLIENT'], auth['API_SECRET'])
     mod_instance = sec.get_module_instance(instance)
     mod_type = sec.get_module_type(mod_instance['module_type_id'])
     encoded = sec.encode_img(mod_instance['settings']['custom_ICON'])
@@ -39,11 +39,11 @@ def check_config_spec(current_config, workflows):
 def health():
     auth = get_jwt()
     try:
-        sxo = SXO(auth)
-        deliberate = sxo.get_workflow_by_category('deliberate')
-        observe = sxo.get_workflow_by_category('observe')
+        automate = XdrAutomate(auth)
+        deliberate = automate.get_workflow_by_category('deliberate')
+        observe = automate.get_workflow_by_category('observe')
         instance = get_instance()
-        sec = securex.SecureX(auth['API_CLIENT'], auth['API_SECRET'])
+        sec = xdr.XDR(auth['API_CLIENT'], auth['API_SECRET'])
         mod_instance = sec.get_module_instance(instance)
         mod_type = sec.get_module_type(mod_instance['module_type_id'])
         for spec in mod_type['configuration_spec']:
@@ -52,7 +52,7 @@ def health():
             if spec['key'] == 'custom_OBSERVE_WORKFLOW':
                 spec['options'] = check_config_spec(spec['options'], observe)
             if spec['key'] == 'custom_TILE_TABLE':
-                spec['options'] = sxo.get_tile_table_types()
+                spec['options'] = automate.get_tile_table_types()
         mod_type.pop('org_id')
         mod_type.pop('id')
         mod_type.pop('record')
@@ -67,6 +67,6 @@ def health():
         sec.update_module_type(mod_instance['module_type_id'], mod_type)
     except:
         pass
-    #sxo.create_input_config(sxo.refer_id, 'ip', 'sxo test object')
-    #sxo.run_workflow(sxo.refer_id)
+    #automate.create_input_config(automate.refer_id, 'ip', 'automate test.py object')
+    #automate.run_workflow(automate.refer_id)
     return jsonify_data({'status': 'ok'})

@@ -1,47 +1,53 @@
 {
-  "prod": {
+  "us": {
     "app_function": "app.app",
-    "aws_region": "us-east-1",
+    "aws_region": "us-west-2",
     "keep_warm": false,
     "log_level": "INFO",
-    "profile_name": "serverless",
-    "project_name": "sxo-relay-project",
-    "runtime": "python3.7",
-    "s3_bucket": "zappa-sxo-relay-projectprod-s3",
+    "project_name": "xdr-automate-relay-us",
+    "runtime": "python3.11",
+    "s3_bucket": "zappa-xdr-automate-relay-us-s3",
     "memory_size": 4096,
     "timeout_seconds": 90,
     "environment_variables": {
-      "SECRET_KEY": ""
+      "SECRET_KEY": "",
+      "XDR_URL": "https://visibility.amp.cisco.com",
+      "CTIA_URL": "https://private.intel.amp.cisco.com",
+      "AUTOMATE_URL": "https://automate.us.security.cisco.com/api/v1"
     }
   },
-    "dev": {
-      "app_function": "app.app",
-      "aws_region": "us-east-1",
-      "keep_warm": false,
-      "log_level": "INFO",
-      "profile_name": "serverless",
-      "project_name": "sxo-relay-project-dev",
-      "runtime": "python3.7",
-      "s3_bucket": "zappa-sxo-relay-project-dev-s3",
-      "memory_size": 4096,
-      "timeout_seconds": 90,
-      "environment_variables": {
-        "SECRET_KEY": ""
-      }
-    },
-      "eu": {
-        "app_function": "app.app",
-        "aws_region": "us-east-1",
-        "keep_warm": false,
-        "log_level": "INFO",
-        "profile_name": "serverless",
-        "project_name": "sxo-relay-project-dev",
-        "runtime": "python3.7",
-        "s3_bucket": "zappa-sxo-relay-project-eu-s3",
-        "memory_size": 4096,
-        "timeout_seconds": 90,
-        "environment_variables": {
-          "SECRET_KEY": ""
-        }
-      }
+  "eu": {
+    "app_function": "app.app",
+    "aws_region": "us-west-2",
+    "keep_warm": false,
+    "log_level": "INFO",
+    "project_name": "xdr-automate-relay-eu",
+    "runtime": "python3.11",
+    "s3_bucket": "zappa-xdr-automate-relay-eu-s3",
+    "memory_size": 4096,
+    "timeout_seconds": 90,
+    "environment_variables": {
+      "SECRET_KEY": "",
+      "XDR_URL": "https://visibility.eu.amp.cisco.com",
+      "CTIA_URL": "https://visibility.eu.amp.cisco.com",
+      "AUTOMATE_URL": "https://automate.eu.security.cisco.com/api/v1"
     }
+  },
+  "apjc": {
+    "app_function": "app.app",
+    "aws_region": "us-west-2",
+    "keep_warm": false,
+    "log_level": "INFO",
+    "project_name": "xdr-automate-relay-project-apjc",
+    "runtime": "python3.11",
+    "s3_bucket": "zappa-xdr-automate-relay-project-apjc-s3",
+    "memory_size": 4096,
+    "timeout_seconds": 90,
+    "environment_variables": {
+      "SECRET_KEY": "",
+      "XDR_URL": "https://visibility.apjc.amp.cisco.com",
+      "CTIA_URL": "https://visibility.apjc.amp.cisco.com",
+      "AUTOMATE_URL": "https://automate.apjc.security.cisco.com/api/v1"
+    }
+  }
+}

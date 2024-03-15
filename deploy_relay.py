@@ -11,13 +11,13 @@ import secrets
 import ssl
 
 
-parser = argparse.ArgumentParser(description='SecureX Relay Deployment Tool.', prog='SecureX Relay Deployer')
+parser = argparse.ArgumentParser(description='XDR Automate Relay Deployment Tool.', prog='XDR Automate Relay Deployer')
 parser.add_argument('o', help='Operation to be performed, can be "deploy, update, or remove"')
 parser.add_argument('-r', help='AWS region serverless app will be deployed. Example: "-r us-east-1"')
-parser.add_argument('-p', help='Project name for serverless function and required buckets. Example: "-p Demo SecureX Relay"')
-parser.add_argument('-x', help='SecureX Region US, EU, APJC. Example: "-i US"')
-parser.add_argument('-i', help='SecureX API Client ID. Example: "-i client_......"')
-parser.add_argument('-s', help='SecureX API Client Secret')
+parser.add_argument('-p', help='Project name for serverless function and required buckets. Example: "-p Demo XDR Automate Relay"')
+parser.add_argument('-x', help='XDR Automate Region US, EU, APJC. Example: "-i US"')
+parser.add_argument('-i', help='XDR Automate API Client ID. Example: "-i client_......"')
+parser.add_argument('-s', help='XDR Automate API Client Secret')
 parser.add_argument('-m', help='Memory for Serverless Instance. Example "-m 4096"', type=int, required=False)
 parser.add_argument('-t', help='Relay Timeout in Seconds. Example "-t 90"', type=int, required=False)
 
@@ -80,7 +80,7 @@ def get_token(i, s):
     res = conn.getresponse()
     data = res.read()
     if res.status == 200:
-        print('Obtained SecureX Auth Token')
+        print('Obtained XDR Automate Auth Token')
         return json.loads(data.decode("utf-8"))['access_token']
     print('Issue Generating Token, Please Check Configuration and Try Again  \n')
     os.close()
@@ -97,7 +97,7 @@ def post_module(module, token):
     res = conn.getresponse()
     data = res.read()
     if res.status == 201:
-        print('SecureX Integration Module Created  \n')
+        print('XDR Automate Integration Module Created  \n')
         return json.loads(data.decode("utf-8"))
     print('Issue Deploying Module, Please Check Configuration and Try Again  \n')
     os.close()
@@ -114,7 +114,7 @@ def delete_module(module, token):
     res = conn.getresponse()
     data = res.read()
     if res.status == 204 or res.status == 404:
-        print('SecureX Integration Module Deleted  \n')
+        print('XDR Automate Integration Module Deleted  \n')
         delete_integration_id()
 
 
@@ -192,7 +192,7 @@ def main():
             if url:
                 if path.exists('securex_app_id'):
                     if op == 'update':
-                        print('SecureX module already exists, skipping this step to avoid duplicates')
+                        print('XDR Automate module already exists, skipping this step to avoid duplicates')
                         return
                     mod = get_integration_id()
                     delete_module(mod, token)

@@ -1,9 +1,9 @@
-from jwt import PyJWKClient
-import jwt as pyjwt
-from authlib.jose import jwt
-from authlib.jose.errors import DecodeError, BadSignatureError
-from flask import request, current_app, jsonify
 from datetime import datetime, timedelta
+
+import jwt as pyjwt
+from authlib.jose.errors import DecodeError, BadSignatureError
+from flask import request, jsonify
+
 from api.errors import AuthorizationError, InvalidArgumentError
 
 
@@ -49,8 +49,8 @@ def get_jwt():
         return jwks_host
     except tuple(expected_errors) as error:
         raise AuthorizationError(expected_errors[error.__class__])
-    
-    
+
+
 def get_instance():
     instance = request.headers.environ['HTTP_X_MODULE_INSTANCE_ID']
     return instance
@@ -82,6 +82,7 @@ def jsonify_data(data):
 
 def jsonify_errors(data):
     return jsonify({'errors': [data]})
+
 
 def format_docs(docs):
     return {'count': len(docs), 'docs': docs}
@@ -119,21 +120,21 @@ key_types = [
 
 def get_tile():
     return {
-                'description': '',
-                'periods': [
-                    #'last_24_hours',
-                    #'last_7_days',
-                    #'last_30_days',
-                    #'last_60_days',
-                    #'last_90_days'
-                ],
-                'tags': [],
-                'type': '',
-                'short_description': '',
-                'title': '',
-                'default_period': '',
-                'id': ''
-            }
+        'description': '',
+        'periods': [
+            # 'last_24_hours',
+            # 'last_7_days',
+            # 'last_30_days',
+            # 'last_60_days',
+            # 'last_90_days'
+        ],
+        'tags': [],
+        'type': '',
+        'short_description': '',
+        'title': '',
+        'default_period': '',
+        'id': ''
+    }
 
 
 def set_tile(t):
@@ -173,10 +174,10 @@ def set_donut_tile_data(rings, tags, data):
     response = []
     for r in range(len(rings)):
         item = {
-                'key': r,
-                'value': sum(data[r]),
-                'segments': []
-            }
+            'key': r,
+            'value': sum(data[r]),
+            'segments': []
+        }
         for t in range(len(tags)):
             item['segments'].append({
                 'key': t,
