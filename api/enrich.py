@@ -169,7 +169,8 @@ def deliberate_observables():
             if disposition:
                 response['verdicts'].append(get_verdict(o['value'], o['type'], disposition, valid_time))
                 response['judgements'].append(get_judgement(o['value'], o['type'], disposition, valid_time))
-        except:
+        except Exception as e:
+            print(e)
             continue
     if not response['verdicts'] and not response['judgements']:
         return jsonify_data({})
@@ -193,7 +194,8 @@ def observe_observables():
             if observe:
                 response['sightings']['count'] += 1
                 response['sightings']['docs'].append(observe)
-        except:
+        except Exception as e:
+            print(e)
             continue
     return jsonify_data(response)
 

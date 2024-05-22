@@ -155,6 +155,7 @@ def tiles():
         automate = XdrAutomate(auth)
         return jsonify_data(get_tile_modules(automate))
     except Exception as e:
+        print(e)
         return jsonify_data([])
 
 
@@ -208,4 +209,5 @@ def tile_data():
         req = get_json(DashboardTileDataSchema())
         return jsonify_data(get_tile_data(automate, req))
     except Exception as e:
+        print(e)
         return jsonify_data({})
