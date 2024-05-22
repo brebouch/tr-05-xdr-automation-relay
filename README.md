@@ -37,7 +37,7 @@ pip install -r requirements.txt
 3. Run the deployment script to deploy the serverless app and configure the integration:
 
 ```bash
-python deployment_script.py deploy -r <AWS region> -p <Project name> -x <XDR Automate Region> -i <XDR Automate API Client ID> -s <XDR Automate API Client Secret> -m <Memory for Serverless Instance> -t <Relay Timeout in Seconds>
+python deploy_relay.py deploy -r <AWS region> -p <Project name> -x <XDR Automate Region> -i <XDR Automate API Client ID> -s <XDR Automate API Client Secret> -m <Memory for Serverless Instance> -t <Relay Timeout in Seconds>
 ```
 
 4. Import Create XDR Relay Module Instance.json workflow in XDR Automation
