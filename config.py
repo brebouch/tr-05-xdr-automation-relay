@@ -11,7 +11,7 @@ class Config:
     }
 
     CTR_HEADERS = {
-        'User-Agent': ('SecureX Threat Response Integrations '
+        'User-Agent': ('XDR Integrations '
                        '<tr-integrations-support@cisco.com>')
     }
 
