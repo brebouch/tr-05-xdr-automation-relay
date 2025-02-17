@@ -120,21 +120,21 @@ def delete_module(module, token):
 
 def delete_integration_id():
     try:
-        os.remove('securex_app_id')
+        os.remove('xdr_app_id')
     except:
         return
 
 
 def get_integration_id():
     try:
-        with open('securex_app_id', 'r') as app_id:
+        with open('xdr_app_id', 'r') as app_id:
             return app_id.read()
     except:
         return
 
 
 def update_integration_id(i):
-    with open('securex_app_id', 'w') as app_id:
+    with open('xdr_app_id', 'w') as app_id:
         app_id.write(i)
 
 
@@ -181,16 +181,16 @@ def main():
     args = vars(parser.parse_args())
     op = check_operation(args['o'])
     encrypt_sec = generate_secret_key()
-    securex_region = get_region(args['x'])
+    xdr_region = get_region(args['x'])
     token = get_token(args['i'], args['s'])
-    if not securex_region:
+    if not xdr_region:
         print('Unknown value for region, must be US, EU, or APJC')
         return
     if op == 'deploy' or op == 'update':
         if create_zappa_config(args['r'], args['p'], encrypt_sec, args['m'], args['t']):
             url = deploy_zappa(op)
             if url:
-                if path.exists('securex_app_id'):
+                if path.exists('xdr_app_id'):
                     if op == 'update':
                         print('XDR Automate module already exists, skipping this step to avoid duplicates')
                         return
